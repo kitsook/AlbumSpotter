@@ -1,5 +1,4 @@
 .cache
-images/
 venv/
 *.json
 *.csv

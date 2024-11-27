@@ -23,7 +23,8 @@ def filter_images(image_dict):
             if image_size(image) > max_size:
                 best_image = image
                 max_size = image_size(image)
-        result[id] = best_image
+        if best_image:
+            result[id] = best_image
 
     return result
 
