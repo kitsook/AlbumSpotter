@@ -34,6 +34,11 @@ def transform_training_images():
             blurred_imgs = [blurrer(orig_img) for _ in range(5)]
             _save_training_images(album_folder, blurred_imgs)
 
+            crop_transformer = v2.RandomResizedCrop(size=config['TRAINING_IMG_SIZE'])
+            crop_imgs = [crop_transformer(orig_img) for _ in range(10)]
+            _save_training_images(album_folder, crop_imgs)
+
+
 def _save_training_images(album_folder, images):
     for img in images:
         new_img_name = str(uuid.uuid4()) + ".jpg"

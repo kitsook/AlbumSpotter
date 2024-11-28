@@ -7,7 +7,7 @@ from PIL import Image
 
 from config import config
 
-model_timestamp = '20241128002101'
+model_timestamp = '20241128014712'
 model_file = config['OUTPUT_MODILE_FOLDER'] + "model_" + model_timestamp + ".zip"
 mapping_file = config['OUTPUT_MODILE_FOLDER'] + "mapping_" + model_timestamp + ".json"
 
@@ -37,8 +37,9 @@ capture = cv2.VideoCapture(0)
 while True:
     input("Press Enter to capture an image...")
     # discard first few frames
-    for _ in range(5):
+    for _ in range(10):
         retval, frame = capture.read()
+
     if retval:
         # cv2.imshow("camera", img)
 
@@ -51,6 +52,9 @@ while True:
         output = model(x)
         output = output.to(device)
         index = output.data.numpy().argmax()
+        confidences = output.data.numpy().squeeze()
+        print(confidences)
+        print(index)
 
         predicted_album_id = mappings[str(index.item())]
-        print("I am guessing the album is %s" % albums_dict[predicted_album_id]['name'])
+        print("I am guessing the album is %s with confidence " % albums_dict[predicted_album_id]['name'])

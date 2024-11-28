@@ -3,3 +3,4 @@ venv/
 *.json
 *.csv
 __pycache__/
+checkpoint.pt

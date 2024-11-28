@@ -1,5 +1,6 @@
 certifi==2024.8.30
 charset-normalizer==3.4.0
+early-stopping-pytorch==1.0.10
 filelock==3.16.1
 fsspec==2024.10.0
 idna==3.10
@@ -20,6 +21,7 @@ nvidia-cusparse-cu12==12.3.1.170
 nvidia-nccl-cu12==2.21.5
 nvidia-nvjitlink-cu12==12.4.127
 nvidia-nvtx-cu12==12.4.127
+opencv-python==4.10.0.84
 pillow==11.0.0
 redis==5.2.0
 requests==2.32.3

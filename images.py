@@ -23,7 +23,7 @@ def _get_cover_arts(use_cache = True):
                     len(limit_ids) == 0 or album['id'] in limit_ids }
 
     images = _filter_images(images)
-    logging.info("Preparing %d images", len(images))
+    logging.info("Fetching cover art for %d albums", len(images))
     for album_id, image in images.items():
         filename = album_id + ".jpg"
         _fetch_image(image, filename, use_cache)
