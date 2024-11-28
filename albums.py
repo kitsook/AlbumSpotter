@@ -4,9 +4,8 @@ import os.path
 
 from spotify import sp
 
-DUMP_TO = 'my_albums.json'
+CACHE_FILE = 'my_albums.json'
 KEYS_TO_GET = { 'id', 'total_tracks', 'href', 'name', 'uri', 'artists', 'images' }
-SPOTIFY_SCOPE = 'user-library-read'
 
 def get_my_albums(sp, keys = KEYS_TO_GET, use_cache = True):
     result = []
@@ -29,13 +28,13 @@ def get_my_albums(sp, keys = KEYS_TO_GET, use_cache = True):
     return result
 
 def _load_from_cache():
-    if os.path.isfile(DUMP_TO):
-        with open(DUMP_TO, encoding='utf-8') as f:
+    if os.path.isfile(CACHE_FILE):
+        with open(CACHE_FILE, encoding='utf-8') as f:
             return json.load(f)
     return []
 
 def _save_cache(my_albums):
-    with open(DUMP_TO, 'w', encoding='utf-8') as f:
+    with open(CACHE_FILE, 'w', encoding='utf-8') as f:
         json.dump(my_albums, f, indent=2)
 
 if __name__ == "__main__":
