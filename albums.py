@@ -2,12 +2,11 @@ import json
 import logging
 import os.path
 
+from config import config
 from spotify import sp
 
-CACHE_FILE = 'my_albums.json'
-KEYS_TO_GET = { 'id', 'total_tracks', 'href', 'name', 'uri', 'artists', 'images' }
 
-def get_my_albums(sp, keys = KEYS_TO_GET, use_cache = True):
+def get_my_albums(keys = config['KEYS_TO_GET'], use_cache = True):
     result = []
 
     if use_cache:
@@ -28,18 +27,18 @@ def get_my_albums(sp, keys = KEYS_TO_GET, use_cache = True):
     return result
 
 def _load_from_cache():
-    if os.path.isfile(CACHE_FILE):
-        with open(CACHE_FILE, encoding='utf-8') as f:
+    if os.path.isfile(config['CACHE_FILE']):
+        with open(config['CACHE_FILE'], encoding='utf-8') as f:
             return json.load(f)
     return []
 
 def _save_cache(my_albums):
-    with open(CACHE_FILE, 'w', encoding='utf-8') as f:
+    with open(config['CACHE_FILE'], 'w', encoding='utf-8') as f:
         json.dump(my_albums, f, indent=2)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    my_albums = get_my_albums(sp, use_cache=False)
+    my_albums = get_my_albums(use_cache=False)
     logging.info("Dumped %d albums", len(my_albums))
     _save_cache(my_albums)
