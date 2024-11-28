@@ -13,6 +13,8 @@ config = {
     # file name for the resized cover art for training
     'ORIG_IMAGE_NAME': 'orig.jpg',
     # image size for training
-    'TRAINING_IMG_SIZE': (224, 224)
+    'TRAINING_IMG_SIZE': (224, 224),
+    # output model path
+    'OUTPUT_MODILE_FOLDER': './models/',
 }
 
