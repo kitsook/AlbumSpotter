@@ -7,7 +7,7 @@ from PIL import Image
 
 from config import config
 
-model_timestamp = '20241128034516'
+model_timestamp = '20241128100433'
 model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + model_timestamp + ".zip"
 mapping_file = config['OUTPUT_MODEL_FOLDER'] + "mapping_" + model_timestamp + ".json"
 
@@ -31,18 +31,15 @@ transform = transforms.Compose([
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
-# cv2.namedWindow("camera", 1)
 capture = cv2.VideoCapture(0)
 
 while True:
     input("Press Enter to capture an image...")
-    # discard first few frames
+    # discard first few frames. some webcams give dark images for initial frames
     for _ in range(10):
         retval, frame = capture.read()
 
     if retval:
-        # cv2.imshow("camera", img)
-
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(frame)
         image.save("./inference_image.jpg")
@@ -58,3 +55,6 @@ while True:
         predicted_album_name = albums_dict[predicted_album_id]['name']
         confidence = confidences[index.item()]
         print("I am guessing the album is %s with confidence %0.4f" % (predicted_album_name, confidence))
+    else:
+        print("No frame captured")
+        break

@@ -24,48 +24,49 @@ transform = transforms.Compose([
 train_dataset = torchvision.datasets.ImageFolder(root=config['TRAINING_IMAGES_FOLDER'], transform=transform)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 
-# Load the ResNet50 model
+# load the ResNet50 model
 model = torchvision.models.resnet50(weights=ResNet50_Weights.DEFAULT)
 
-# Parallelize training across multiple GPUs
+# parallelize training across multiple GPUs
 model = torch.nn.DataParallel(model)
 
+# modify the fully connected layer
 in_features = model.module.fc.in_features
 out_features = len(train_dataset.classes)
 model.module.fc = torch.nn.Linear(in_features, out_features, bias=True)
 
-# Set the model to run on the device
+# set the model to run on the device
 model = model.to(device)
 
-# Define the loss function and optimizer
+# define the loss function and optimizer
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-# Initialize early stopping object
+# initialize early stopping object
 early_stopping = EarlyStopping(patience=7, verbose=True)
 
-# Train the model...
+# train the model...
 for epoch in range(num_epochs):
     for inputs, labels in train_loader:
-        # Move input and label tensors to the device
+        # move input and label tensors to the device
         inputs = inputs.to(device)
         labels = labels.to(device)
 
-        # Zero out the optimizer
+        # zero out the optimizer
         optimizer.zero_grad()
 
-        # Forward pass
+        # forward pass
         outputs = model(inputs)
         loss = criterion(outputs, labels)
 
-        # Backward pass
+        # backward pass
         loss.backward()
         optimizer.step()
 
-    # Print the loss for every epoch
+    # print the loss for every epoch
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item():.4f}')
 
-    # Early stopping call
+    # early stopping call
     early_stopping(loss.item(), model)
     if early_stopping.early_stop:
         print("Early stopping triggered")
