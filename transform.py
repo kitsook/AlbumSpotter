@@ -23,7 +23,7 @@ def transform_training_images():
             _save_training_images(album_folder, padded_imgs)
 
             perspective_transformer = v2.RandomPerspective(distortion_scale=0.6, p=1.0, fill=random.randint(0, 255))
-            perspective_imgs = [perspective_transformer(orig_img) for _ in range(5)]
+            perspective_imgs = [perspective_transformer(orig_img) for _ in range(10)]
             _save_training_images(album_folder, perspective_imgs)
 
             affine_transfomer = v2.RandomAffine(degrees=(30, 70), translate=(0.1, 0.3), scale=(0.5, 0.75), fill=random.randint(0, 255))

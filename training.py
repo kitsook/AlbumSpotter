@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import torch
 import torchvision
@@ -20,7 +21,6 @@ transform = transforms.Compose([
 ])
 
 train_dataset = torchvision.datasets.ImageFolder(root=config['TRAINING_IMAGES_FOLDER'], transform=transform)
-
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 
 # Load the ResNet50 model
@@ -58,6 +58,10 @@ for epoch in range(num_epochs):
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item():.4f}')
 
 print(f'Finished Training, Loss: {loss.item():.4f}')
-now = datetime.datetime.now()
-model_filename = config['OUTPUT_MODILE_FOLDER'] + "model_" + now.strftime("%Y%m%d") + ".zip"
+now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+model_filename = config['OUTPUT_MODILE_FOLDER'] + "model_" + now + ".zip"
 torch.save(model, model_filename)
+
+mappings = { v: k for k,v in train_dataset.class_to_idx.items() }
+with open(config['OUTPUT_MODILE_FOLDER'] + "mapping_" + now + ".json", 'w', encoding='utf-8') as f:
+    json.dump(mappings, f, indent=2)
