@@ -7,9 +7,9 @@ from PIL import Image
 
 from config import config
 
-model_timestamp = '20241128014712'
-model_file = config['OUTPUT_MODILE_FOLDER'] + "model_" + model_timestamp + ".zip"
-mapping_file = config['OUTPUT_MODILE_FOLDER'] + "mapping_" + model_timestamp + ".json"
+model_timestamp = '20241128034516'
+model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + model_timestamp + ".zip"
+mapping_file = config['OUTPUT_MODEL_FOLDER'] + "mapping_" + model_timestamp + ".json"
 
 mappings = {}
 with open(mapping_file, encoding='utf-8') as f:
@@ -53,8 +53,8 @@ while True:
         output = output.to(device)
         index = output.data.numpy().argmax()
         confidences = output.data.numpy().squeeze()
-        print(confidences)
-        print(index)
 
         predicted_album_id = mappings[str(index.item())]
-        print("I am guessing the album is %s with confidence " % albums_dict[predicted_album_id]['name'])
+        predicted_album_name = albums_dict[predicted_album_id]['name']
+        confidence = confidences[index.item()]
+        print("I am guessing the album is %s with confidence %0.4f" % (predicted_album_name, confidence))

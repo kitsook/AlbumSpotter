@@ -15,6 +15,6 @@ config = {
     # image size for training
     'TRAINING_IMG_SIZE': (224, 224),
     # output model path
-    'OUTPUT_MODILE_FOLDER': './models/',
+    'OUTPUT_MODEL_FOLDER': './models/',
 }
 

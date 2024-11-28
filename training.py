@@ -12,9 +12,9 @@ from config import config
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # hyperparameters
-num_epochs = 10
-batch_size = 64
-learning_rate = 0.001
+num_epochs = 30
+batch_size = 128
+learning_rate = 0.0001
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -71,11 +71,13 @@ for epoch in range(num_epochs):
         print("Early stopping triggered")
         break
 
-print(f'Finished Training, Loss: {loss.item():.4f}')
+# load the last checkpoint with the best model
+model.load_state_dict(torch.load('checkpoint.pt', weights_only=True))
+
 now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-model_filename = config['OUTPUT_MODILE_FOLDER'] + "model_" + now + ".zip"
+model_filename = config['OUTPUT_MODEL_FOLDER'] + "model_" + now + ".zip"
 torch.save(model, model_filename)
 
 mappings = { v: k for k,v in train_dataset.class_to_idx.items() }
-with open(config['OUTPUT_MODILE_FOLDER'] + "mapping_" + now + ".json", 'w', encoding='utf-8') as f:
+with open(config['OUTPUT_MODEL_FOLDER'] + "mapping_" + now + ".json", 'w', encoding='utf-8') as f:
     json.dump(mappings, f, indent=2)
