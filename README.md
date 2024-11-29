@@ -42,7 +42,7 @@ The script also saves a copy of each album art cover into the
 training folder in preparation of the transformation and augmentation.
 
 To limit what albums to be processed (e.g. testing out the workflow with a
-smaller sample of albums), edit `LIMIT_IMAGES_FILE` IN
+smaller sample of albums), edit `LIMIT_IMAGES_FILE` in
 `config.py` and create a json file to list out those album IDs.
 
 
