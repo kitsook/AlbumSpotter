@@ -1,7 +1,7 @@
 # AlbumSpotter
 
 These scripts can be used to train a machine learning model to
-identify the cover art of a music album.
+identify a music album by cover art photos.
 
 - collect information of saved albums from Spotify
 - download cover art of the albums
@@ -42,7 +42,7 @@ The script also saves a copy of each album art cover into the
 training folder in preparation of the transformation and augmentation.
 
 To limit what albums to be processed (e.g. testing out the workflow with a
-smaller sample of albums), edit `LIMIT_IMAGES_FILE` in
+smaller sample of albums), edit `LIMIT_IMAGES_FILE` IN
 `config.py` and create a json file to list out those album IDs.
 
 
@@ -68,3 +68,7 @@ also a "mapping" file to lookup the album ID by the model output class index.
 
 This script captures an image from webcam and guesses what that album is. Modify
 the `MODEL_TIMESTAMP` constant to choose which trained model to use.
+
+The mapping file and cached album data is also loaded so that the script can
+provide information (e.g. URL to play the album on Spotify) about the
+identified album.
