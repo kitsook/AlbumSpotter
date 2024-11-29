@@ -26,8 +26,8 @@ def transform_training_images():
             perspective_imgs = [perspective_transformer(orig_img) for _ in range(5)]
             _save_training_images(album_folder, perspective_imgs)
 
-            affine_transfomer = v2.RandomAffine(degrees=(30, 70), translate=(0.1, 0.3), scale=(0.5, 0.75), fill=random.randint(0, 255))
-            affine_imgs = [affine_transfomer(orig_img) for _ in range(5)]
+            affine_transfomer = v2.RandomAffine(degrees=20, translate=(0.1, 0.3), scale=(0.5, 0.75), fill=random.randint(0, 255))
+            affine_imgs = [affine_transfomer(orig_img) for _ in range(8)]
             _save_training_images(album_folder, affine_imgs)
 
             blurrer = v2.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5.))

@@ -5,20 +5,18 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 
+from albums import get_my_albums
 from config import config
 
-model_timestamp = '20241128100433'
-model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + model_timestamp + ".zip"
+model_timestamp = '20241128185438'
+model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + model_timestamp + ".pt"
 mapping_file = config['OUTPUT_MODEL_FOLDER'] + "mapping_" + model_timestamp + ".json"
 
 mappings = {}
 with open(mapping_file, encoding='utf-8') as f:
     mappings = json.load(f)
 
-my_albums = {}
-with open(config['CACHE_FILE'], encoding='utf-8') as f:
-    my_albums = json.load(f)
-
+my_albums = get_my_albums(use_cache = True)
 albums_dict = { album['id']: album for album in my_albums }
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -44,9 +42,7 @@ while True:
         image = Image.fromarray(frame)
         image.save("./inference_image.jpg")
 
-        x = transform(image)
-        x.unsqueeze_(0)
-        output = model(x)
+        output = model(transform(image).unsqueeze_(0))
         output = output.to(device)
         index = output.data.numpy().argmax()
         confidences = output.data.numpy().squeeze()

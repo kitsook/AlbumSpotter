@@ -8,8 +8,8 @@ config = {
     # folder to store training images. sub-folder will be created for each album
     'TRAINING_IMAGES_FOLDER': './images/training/',
     # an optional json file with an "id" list that limit the albums used for training
-    'LIMIT_IMAGES_FILE': 'my_vinyls.json',
-    # 'LIMIT_IMAGES_FILE': None,
+    # 'LIMIT_IMAGES_FILE': 'my_vinyls.json',
+    'LIMIT_IMAGES_FILE': None,
     # file name for the resized cover art for training
     'ORIG_IMAGE_NAME': 'orig.jpg',
     # image size for training

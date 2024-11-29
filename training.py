@@ -17,6 +17,7 @@ batch_size = 128
 learning_rate = 0.0001
 
 transform = transforms.Compose([
+    transforms.Resize(config['TRAINING_IMG_SIZE']),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
 ])
@@ -75,10 +76,12 @@ for epoch in range(num_epochs):
 # load the last checkpoint with the best model
 model.load_state_dict(torch.load('checkpoint.pt', weights_only=True))
 
+# save model
 now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-model_filename = config['OUTPUT_MODEL_FOLDER'] + "model_" + now + ".zip"
+model_filename = config['OUTPUT_MODEL_FOLDER'] + "model_" + now + ".pt"
 torch.save(model, model_filename)
 
+# save mapping of album id to index
 mappings = { v: k for k,v in train_dataset.class_to_idx.items() }
 with open(config['OUTPUT_MODEL_FOLDER'] + "mapping_" + now + ".json", 'w', encoding='utf-8') as f:
     json.dump(mappings, f, indent=2)
