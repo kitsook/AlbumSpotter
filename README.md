@@ -62,3 +62,9 @@ also a "mapping" file to lookup the album ID by the model output class index.
 
 This script captures an image from webcam and guesses what that album is. Modify
 the `MODEL_TIMESTAMP` constant to choose which trained model to use.
+
+![image](https://github.com/user-attachments/assets/6550386e-7e38-4d89-8411-4d66b7777e53)
+
+![image](https://github.com/user-attachments/assets/953b7b33-0e87-4d83-8b8d-288dfea7fbec)
+
+
