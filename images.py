@@ -14,7 +14,7 @@ from spotify import sp
 
 def prepare_images(size = config['TRAINING_IMG_SIZE'], use_cache = True):
     _get_cover_arts(use_cache)
-    _resize_image_files(size)
+    _save_for_training()
 
 def _get_cover_arts(use_cache = True):
     my_albums = get_my_albums(use_cache = use_cache)
@@ -69,21 +69,24 @@ def _get_limit_ids():
             result = json.load(f)['id']
     return result
 
-def _resize_image_files(size = config['TRAINING_IMG_SIZE']):
+def _save_for_training():
+    limit_ids = _get_limit_ids()
+
     for file in glob.glob(config['COVER_ARTS_FOLDER'] + "*"):
         if not os.path.isfile(file):
             continue
 
         filename, _ = os.path.splitext(os.path.basename(file))
+        if len(limit_ids) > 0 and filename not in limit_ids:
+            continue
+
         album_training_folder = config['TRAINING_IMAGES_FOLDER'] + filename + '/'
         if not os.path.exists(album_training_folder):
             os.makedirs(album_training_folder)
 
         try:
             with Image.open(file) as im:
-                if im.width != size[0] or im.height != size[1]:
-                    im.thumbnail(size, Image.Resampling.LANCZOS)
-                    im.save(album_training_folder + config['ORIG_IMAGE_NAME'])
+                im.save(album_training_folder + config['ORIG_IMAGE_NAME'])
         except IOError:
             logging.error("Failed to process file %s", file)
 

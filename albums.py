@@ -21,7 +21,10 @@ def get_my_albums(keys = config['KEYS_TO_GET'], use_cache = True):
         if len(the_albums) == 0:
             break
 
-        result.extend([{key: album['album'][key] for key in keys} for album in the_albums])
+        if keys and len(keys) > 0:
+            result.extend([{key: album['album'][key] for key in keys} for album in the_albums])
+        else:
+            result.extend(the_albums)
         offset += len(the_albums)
 
     return result

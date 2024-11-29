@@ -3,27 +3,28 @@ import json
 
 import torch
 import torchvision
-import torchvision.transforms as transforms
+import torchvision.transforms.v2 as transforms
 from early_stopping_pytorch import EarlyStopping
 from torchvision.models import ResNet50_Weights
 
 from config import config
 
+# hyperparameters
+NUM_EPOCHS = 30
+BATCH_SIZE = 128
+LEARNING_RATE = 0.0001
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# hyperparameters
-num_epochs = 30
-batch_size = 128
-learning_rate = 0.0001
-
 transform = transforms.Compose([
+    transforms.ToImage(),
     transforms.Resize(config['TRAINING_IMG_SIZE']),
-    transforms.ToTensor(),
+    transforms.ToDtype(torch.float32, scale=True),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
 ])
 
 train_dataset = torchvision.datasets.ImageFolder(root=config['TRAINING_IMAGES_FOLDER'], transform=transform)
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
 
 # load the ResNet50 model
 model = torchvision.models.resnet50(weights=ResNet50_Weights.DEFAULT)
@@ -41,13 +42,13 @@ model = model.to(device)
 
 # define the loss function and optimizer
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 # initialize early stopping object
 early_stopping = EarlyStopping(patience=7, verbose=True)
 
 # train the model...
-for epoch in range(num_epochs):
+for epoch in range(NUM_EPOCHS):
     for inputs, labels in train_loader:
         # move input and label tensors to the device
         inputs = inputs.to(device)
@@ -65,9 +66,9 @@ for epoch in range(num_epochs):
         optimizer.step()
 
     # print the loss for every epoch
-    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item():.4f}')
+    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {loss.item():.4f}')
 
-    # early stopping call
+    # check for early stopping
     early_stopping(loss.item(), model)
     if early_stopping.early_stop:
         print("Early stopping triggered")
