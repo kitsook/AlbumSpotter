@@ -14,6 +14,9 @@ NUM_EPOCHS = 30
 BATCH_SIZE = 128
 LEARNING_RATE = 0.0001
 
+# freezing first few layers in ResNet50 for fine tuning
+FREEZING_LAYERS = ['conv1', 'bn1', 'layer1', 'layer2']
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 transform = transforms.Compose([
@@ -29,20 +32,23 @@ train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE,
 # load the ResNet50 model
 model = torchvision.models.resnet50(weights=ResNet50_Weights.DEFAULT)
 
-# parallelize training across multiple GPUs
-model = torch.nn.DataParallel(model)
-
 # modify the fully connected layer
-in_features = model.module.fc.in_features
-out_features = len(train_dataset.classes)
-model.module.fc = torch.nn.Linear(in_features, out_features, bias=True)
+in_features = model.fc.in_features
+num_classes = len(train_dataset.classes)
+model.fc = torch.nn.Linear(in_features, num_classes, bias=True)
+
+# freeze layers
+for name, layer in model.named_children():
+    if name in FREEZING_LAYERS:
+        for param in layer.parameters():
+            param.requires_grad = False
 
 # set the model to run on the device
 model = model.to(device)
 
 # define the loss function and optimizer
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=LEARNING_RATE)
 
 # initialize early stopping object
 early_stopping = EarlyStopping(patience=7, verbose=True)

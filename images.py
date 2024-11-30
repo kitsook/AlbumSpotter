@@ -23,7 +23,7 @@ def _get_cover_arts(use_cache = True):
                     len(limit_ids) == 0 or album['id'] in limit_ids }
 
     images = _filter_images(images)
-    logging.info("Fetching cover art for %d albums", len(images))
+    logging.info("Preparing cover art for %d albums", len(images))
     for album_id, image in images.items():
         filename = album_id + ".jpg"
         _fetch_image(image, filename, use_cache)
@@ -86,6 +86,8 @@ def _save_for_training():
 
         try:
             with Image.open(file) as im:
+                if im.width != config['TRAINING_IMG_SIZE'][0] or img.height != config['TRAINING_IMG_SIZE'][1]:
+                    im.thumbnail(config['TRAINING_IMG_SIZE'], Image.Resampling.LANCZOS)
                 im.save(album_training_folder + config['ORIG_IMAGE_NAME'])
         except IOError:
             logging.error("Failed to process file %s", file)

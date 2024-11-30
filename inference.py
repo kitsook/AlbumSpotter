@@ -9,8 +9,8 @@ from albums import get_my_albums
 from config import config
 
 # model output level required to be considered as a valid prediction
-PREDICTION_THRESHOLD = 1.
-MODEL_TIMESTAMP = '20241129122836'
+PREDICTION_THRESHOLD = 0.
+MODEL_TIMESTAMP = '20241130040227'
 
 model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + MODEL_TIMESTAMP + ".pt"
 mapping_file = config['OUTPUT_MODEL_FOLDER'] + "mapping_" + MODEL_TIMESTAMP + ".json"
@@ -49,18 +49,18 @@ while True:
 
         output = model(transform(image).unsqueeze_(0))
         output = output.to(device)
-        index = output.data.numpy().argmax()
+        index = output.data.numpy().argmax().item()
         confidences = output.data.numpy().squeeze()
 
-        predicted_album_id = mappings[str(index.item())]
+        predicted_album_id = mappings[str(index)]
         predicted_album_name = albums_dict[predicted_album_id]['name']
         predicted_album_spotify = albums_dict[predicted_album_id]['external_urls']['spotify']
-        confidence = confidences[index.item()]
+        confidence = confidences[index]
         if confidence > PREDICTION_THRESHOLD:
             print("I am guessing the album is '%s' with a confidence of %0.4f. You can play the album on Spotify at %s" %
                   (predicted_album_name, confidence, predicted_album_spotify))
         else:
-            print("I don't recognize the album")
+            print("I don't recognize the album (confidence %0.4f)" % confidence)
     else:
         print("No frame captured")
         break

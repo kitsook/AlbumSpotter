@@ -44,6 +44,8 @@ def transform_training_images():
 def _save_training_images(album_folder, images):
     for img in images:
         new_img_name = str(uuid.uuid4()) + ".jpg"
+        if img.width != config['TRAINING_IMG_SIZE'][0] or img.height != config['TRAINING_IMG_SIZE'][1]:
+            img.thumbnail(config['TRAINING_IMG_SIZE'], Image.Resampling.LANCZOS)
         img.save(album_folder + new_img_name)
 
 
