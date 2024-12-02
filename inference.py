@@ -2,7 +2,6 @@ import json
 
 import cv2
 import torch
-import torchvision.transforms.v2 as transforms
 from PIL import Image
 
 from albums import get_my_albums
@@ -10,7 +9,7 @@ from config import config
 
 # model output level required to be considered as a valid prediction
 PREDICTION_THRESHOLD = 0.
-MODEL_TIMESTAMP = '20241130040227'
+MODEL_TIMESTAMP = '20241201203107'
 
 model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + MODEL_TIMESTAMP + ".pt"
 mapping_file = config['OUTPUT_MODEL_FOLDER'] + "mapping_" + MODEL_TIMESTAMP + ".json"
@@ -26,12 +25,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 model = torch.load(model_file, weights_only=False)
 model.eval()
 
-transform = transforms.Compose([
-        transforms.ToImage(),
-        transforms.Resize(config['TRAINING_IMG_SIZE']),
-        transforms.ToDtype(torch.float32, scale=True),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])
+transform = config['MODEL_TRANSFORMS']
 
 capture = cv2.VideoCapture(0)
 
@@ -47,8 +41,7 @@ while True:
         # save the input image for debugging
         image.save("./inference_image.jpg")
 
-        output = model(transform(image).unsqueeze_(0))
-        output = output.to(device)
+        output = model(transform(image).unsqueeze_(0)).to(device)
         index = output.data.numpy().argmax().item()
         confidences = output.data.numpy().squeeze()
 
@@ -64,3 +57,4 @@ while True:
     else:
         print("No frame captured")
         break
+

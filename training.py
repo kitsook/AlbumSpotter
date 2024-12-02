@@ -3,28 +3,23 @@ import json
 
 import torch
 import torchvision
-import torchvision.transforms.v2 as transforms
 from early_stopping_pytorch import EarlyStopping
+from torchinfo import summary
 from torchvision.models import ResNet50_Weights
 
 from config import config
 
 # hyperparameters
-NUM_EPOCHS = 30
+NUM_EPOCHS = 10
 BATCH_SIZE = 128
 LEARNING_RATE = 0.0001
 
 # freezing first few layers in ResNet50 for fine tuning
-FREEZING_LAYERS = ['conv1', 'bn1', 'layer1', 'layer2']
+FREEZING_LAYERS = ['conv1', 'bn1', 'layer1', 'layer2', 'layer3']
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-transform = transforms.Compose([
-    transforms.ToImage(),
-    transforms.Resize(config['TRAINING_IMG_SIZE']),
-    transforms.ToDtype(torch.float32, scale=True),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-])
+transform = config['MODEL_TRANSFORMS']
 
 train_dataset = torchvision.datasets.ImageFolder(root=config['TRAINING_IMAGES_FOLDER'], transform=transform)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
@@ -43,6 +38,9 @@ for name, layer in model.named_children():
         for param in layer.parameters():
             param.requires_grad = False
 
+# print(model)
+# summary(model, input_size = (1, 3, 224, 224))
+
 # set the model to run on the device
 model = model.to(device)
 
@@ -55,6 +53,13 @@ early_stopping = EarlyStopping(patience=7, verbose=True)
 
 # train the model...
 for epoch in range(NUM_EPOCHS):
+    print()
+    print('Epoch {}/{}'.format(epoch+1, NUM_EPOCHS))
+    print('-' * 11)
+
+    running_loss = 0.0
+    running_corrects = 0
+
     for inputs, labels in train_loader:
         # move input and label tensors to the device
         inputs = inputs.to(device)
@@ -65,17 +70,24 @@ for epoch in range(NUM_EPOCHS):
 
         # forward pass
         outputs = model(inputs)
+        _, preds = torch.max(outputs, 1)
         loss = criterion(outputs, labels)
 
         # backward pass
         loss.backward()
         optimizer.step()
 
+        # statistics
+        running_loss += loss.item() * inputs.size(0)
+        running_corrects += torch.sum(preds == labels.data)
+
     # print the loss for every epoch
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {loss.item():.4f}')
+    epoch_loss = running_loss / len(train_dataset)
+    epoch_acc = running_corrects.double() / len(train_dataset)
+    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.4f}')
 
     # check for early stopping
-    early_stopping(loss.item(), model)
+    early_stopping(epoch_loss, model)
     if early_stopping.early_stop:
         print("Early stopping triggered")
         break

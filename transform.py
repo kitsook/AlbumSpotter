@@ -3,6 +3,7 @@ import os
 import random
 import uuid
 
+import numpy as np
 import torch
 import torchvision.transforms.v2 as transforms
 from PIL import Image
@@ -15,6 +16,7 @@ from spotify import sp
 def transform_training_images():
     torch.manual_seed(42)
     random.seed(1337)
+    np.random.seed(0)
 
     logging.info("Transforming and augmenting images")
     for subfolder in next(os.walk(config['TRAINING_IMAGES_FOLDER']))[1]:
@@ -25,7 +27,7 @@ def transform_training_images():
             perspective_imgs = [perspective_transformer(orig_img) for _ in range(5)]
             _save_training_images(album_folder, perspective_imgs)
 
-            affine_transfomer = transforms.RandomAffine(degrees=20, translate=(0.1, 0.3), scale=(0.5, 0.75), fill=random.randint(0, 255))
+            affine_transfomer = transforms.RandomAffine(degrees=20, translate=(0.1, 0.3), scale=(0.6, 0.8), fill=random.randint(0, 255))
             affine_imgs = [affine_transfomer(orig_img) for _ in range(8)]
             _save_training_images(album_folder, affine_imgs)
 
@@ -38,7 +40,7 @@ def transform_training_images():
             _save_training_images(album_folder, crop_imgs)
 
             jitter = transforms.ColorJitter(brightness=.5, hue=.3)
-            jittered_imgs = [jitter(orig_img) for _ in range(5)]
+            jittered_imgs = [jitter(orig_img) for _ in range(3)]
             _save_training_images(album_folder, jittered_imgs)
 
 def _save_training_images(album_folder, images):
