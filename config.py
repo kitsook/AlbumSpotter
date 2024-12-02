@@ -12,8 +12,8 @@ config = {
     'COVER_ARTS_FOLDER': './images/cover_arts/',
     # folder to store training images. sub-folder will be created for each album
     'TRAINING_IMAGES_FOLDER': './images/training/',
-    # folder to store validation images
-    'VALIDATION_IMAGES_FOLDER': './images/validation/',
+    # folder to store testing images
+    'TESTING_IMAGES_FOLDER': './images/testing/',
     # an optional json file with an "id" list that limit the albums used for training
     # 'LIMIT_IMAGES_FILE': 'my_vinyls.json',
     'LIMIT_IMAGES_FILE': None,

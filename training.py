@@ -13,6 +13,7 @@ from config import config
 NUM_EPOCHS = 10
 BATCH_SIZE = 128
 LEARNING_RATE = 0.0001
+EARLY_STOPPING_PATIENCE = 4
 
 # freezing first few layers in ResNet50 for fine tuning
 FREEZING_LAYERS = ['conv1', 'bn1', 'layer1', 'layer2', 'layer3']
@@ -49,7 +50,7 @@ criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=LEARNING_RATE)
 
 # initialize early stopping object
-early_stopping = EarlyStopping(patience=7, verbose=True)
+early_stopping = EarlyStopping(patience=EARLY_STOPPING_PATIENCE, verbose=True)
 
 # train the model...
 for epoch in range(NUM_EPOCHS):
@@ -86,7 +87,7 @@ for epoch in range(NUM_EPOCHS):
     epoch_acc = running_corrects.double() / len(train_dataset)
     print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.4f}')
 
-    # check for early stopping
+    # check for early stopping. using training loss instead of validation loss
     early_stopping(epoch_loss, model)
     if early_stopping.early_stop:
         print("Early stopping triggered")

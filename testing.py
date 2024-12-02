@@ -25,7 +25,7 @@ def calc_accuracy(model_timestamp):
     correct = 0
 
     subdirs = [ (f.name, f.path) for f in
-                os.scandir(config['VALIDATION_IMAGES_FOLDER']) if f.is_dir() ]
+                os.scandir(config['TESTING_IMAGES_FOLDER']) if f.is_dir() ]
     for album_id, subdir in subdirs:
         for file in os.listdir(subdir):
             image = Image.open(os.path.join(subdir, file))
