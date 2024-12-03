@@ -1,7 +1,7 @@
 # AlbumSpotter
 
 These scripts can be used to train a machine learning model to
-identify a music album by cover art photos.
+identify music albums by cover art photos.
 
 - collect information of saved albums from Spotify
 - download cover art of the albums
