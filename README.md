@@ -8,7 +8,8 @@ identify a music album by cover art photos.
 - transforming and augmenting images for training the machine learning model
 - inferencing with the trained model and provide the album info
 
-![image](https://github.com/user-attachments/assets/6550386e-7e38-4d89-8411-4d66b7777e53)
+<img src="https://github.com/user-attachments/assets/6550386e-7e38-4d89-8411-4d66b7777e53" width="320">
+<br/>
 
 ![image](https://github.com/user-attachments/assets/953b7b33-0e87-4d83-8b8d-288dfea7fbec)
 
