@@ -77,9 +77,10 @@ identified album.
 
 ### testing.py
 
-This script runs all models from th `models` directory against testing data. By default
-testing data is in the `images/testing` folder and configurable in `config.py`. The 
-sub-folder names are the album IDs and testing images can be prepared in those sub-folders.
+This script runs all models from the `models` directory against manually prepared 
+testing data. By default testing data is in the `images/testing` folder and 
+configurable in `config.py`. The sub-folder names are the album IDs and testing
+images can be prepared in those sub-folders.
 
 ![image](https://github.com/user-attachments/assets/9ef37225-b583-4146-bf1a-4f557341abdd)
 
