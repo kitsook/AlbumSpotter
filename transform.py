@@ -10,7 +10,6 @@ from PIL import Image
 
 from config import config
 from images import prepare_images
-from spotify import sp
 
 
 def transform_training_images():

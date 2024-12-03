@@ -9,7 +9,6 @@ from PIL import Image
 
 from albums import get_my_albums
 from config import config
-from spotify import sp
 
 
 def prepare_images(size = config['TRAINING_IMG_SIZE'], use_cache = True):

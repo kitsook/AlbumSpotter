@@ -1,6 +1,7 @@
 import datetime
 import json
 
+import numpy as np
 import torch
 import torchvision
 from early_stopping_pytorch import EarlyStopping
@@ -22,15 +23,17 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 transform = config['MODEL_TRANSFORMS']
 
-train_dataset = torchvision.datasets.ImageFolder(root=config['TRAINING_IMAGES_FOLDER'], transform=transform)
+dataset = torchvision.datasets.ImageFolder(root=config['TRAINING_IMAGES_FOLDER'], transform=transform)
+train_dataset, valid_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
+valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
 
 # load the ResNet50 model
 model = torchvision.models.resnet50(weights=ResNet50_Weights.DEFAULT)
 
 # modify the fully connected layer
 in_features = model.fc.in_features
-num_classes = len(train_dataset.classes)
+num_classes = len(dataset.classes)
 model.fc = torch.nn.Linear(in_features, num_classes, bias=True)
 
 # freeze layers
@@ -52,15 +55,15 @@ optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters(
 # initialize early stopping object
 early_stopping = EarlyStopping(patience=EARLY_STOPPING_PATIENCE, verbose=True)
 
-# train the model...
+print("Start training...")
 for epoch in range(NUM_EPOCHS):
-    print()
-    print('Epoch {}/{}'.format(epoch+1, NUM_EPOCHS))
-    print('-' * 11)
+    train_losses = []
+    valid_losses = []
+    train_corrects = 0
+    valid_corrects = 0
 
-    running_loss = 0.0
-    running_corrects = 0
-
+    # training...
+    model.train()
     for inputs, labels in train_loader:
         # move input and label tensors to the device
         inputs = inputs.to(device)
@@ -79,16 +82,30 @@ for epoch in range(NUM_EPOCHS):
         optimizer.step()
 
         # statistics
-        running_loss += loss.item() * inputs.size(0)
-        running_corrects += torch.sum(preds == labels.data)
+        train_corrects += torch.sum(preds == labels.data)
+        train_losses.append(loss.item())
 
-    # print the loss for every epoch
-    epoch_loss = running_loss / len(train_dataset)
-    epoch_acc = running_corrects.double() / len(train_dataset)
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.4f}')
+    # validating...
+    model.eval()
+    for inputs, labels in valid_loader:
+        outputs = model(inputs)
+        _, preds = torch.max(outputs, 1)
+        loss = criterion(outputs, labels)
 
-    # check for early stopping. using training loss instead of validation loss
-    early_stopping(epoch_loss, model)
+        valid_corrects += torch.sum(preds == labels.data)
+        valid_losses.append(loss.item())
+
+    # print stats for every epoch
+    train_acc = train_corrects.double() / len(train_dataset)
+    valid_acc = valid_corrects.double() / len(valid_dataset)
+    train_loss = np.average(train_losses)
+    valid_loss = np.average(valid_losses)
+    print(f'Epoch {epoch+1}/{NUM_EPOCHS}: ' +
+          f'Training Loss: {train_loss:.4f}, Training Accuracy: {train_acc:.4f}; ' +
+          f'Validation Loss: {valid_loss:.4f}, Validation Accuracy: {valid_acc:.4f}')
+
+    # check for early stopping
+    early_stopping(valid_loss, model)
     if early_stopping.early_stop:
         print("Early stopping triggered")
         break
@@ -102,6 +119,6 @@ model_filename = config['OUTPUT_MODEL_FOLDER'] + "model_" + now + ".pt"
 torch.save(model, model_filename)
 
 # save mapping of album id to index
-mappings = { v: k for k,v in train_dataset.class_to_idx.items() }
+mappings = { v: k for k,v in dataset.class_to_idx.items() }
 with open(config['OUTPUT_MODEL_FOLDER'] + "mapping_" + now + ".json", 'w', encoding='utf-8') as f:
     json.dump(mappings, f, indent=2)

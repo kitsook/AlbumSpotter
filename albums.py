@@ -2,12 +2,17 @@ import json
 import logging
 import os.path
 
-from config import config
-from spotify import sp
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
+from config import config
+
+
+_SPOTIFY_SCOPE = 'user-library-read'
 
 def get_my_albums(keys = config['KEYS_TO_GET'], use_cache = True):
     result = []
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=_SPOTIFY_SCOPE))
 
     if use_cache:
         result = _load_from_cache()
