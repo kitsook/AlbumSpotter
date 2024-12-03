@@ -8,8 +8,8 @@ from albums import get_my_albums
 from config import config
 
 # model output level required to be considered as a valid prediction
-PREDICTION_THRESHOLD = 0.
-MODEL_TIMESTAMP = '20241202140150'
+PREDICTION_THRESHOLD = -99.
+MODEL_TIMESTAMP = '20241202172244'
 
 model_file = config['OUTPUT_MODEL_FOLDER'] + "model_" + MODEL_TIMESTAMP + ".pt"
 mapping_file = config['OUTPUT_MODEL_FOLDER'] + "mapping_" + MODEL_TIMESTAMP + ".json"

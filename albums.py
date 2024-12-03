@@ -32,6 +32,9 @@ def get_my_albums(keys = config['KEYS_TO_GET'], use_cache = True):
             result.extend(the_albums)
         offset += len(the_albums)
 
+    _save_cache(result)
+    logging.info("Dumped %d albums", len(result))
+
     return result
 
 def _load_from_cache():
@@ -48,5 +51,3 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     my_albums = get_my_albums(use_cache=False)
-    logging.info("Dumped %d albums", len(my_albums))
-    _save_cache(my_albums)
