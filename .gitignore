@@ -4,3 +4,5 @@ venv/
 *.csv
 __pycache__/
 checkpoint.pt
+*.jpg
+
