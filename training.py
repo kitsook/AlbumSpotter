@@ -87,13 +87,14 @@ for epoch in range(NUM_EPOCHS):
 
     # validating...
     model.eval()
-    for inputs, labels in valid_loader:
-        outputs = model(inputs)
-        _, preds = torch.max(outputs, 1)
-        loss = criterion(outputs, labels)
+    with torch.no_grad(): # Disable gradient calculations
+        for inputs, labels in valid_loader:
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+            loss = criterion(outputs, labels)
 
-        valid_corrects += torch.sum(preds == labels.data)
-        valid_losses.append(loss.item())
+            valid_corrects += torch.sum(preds == labels.data)
+            valid_losses.append(loss.item())
 
     # print stats for every epoch
     train_acc = train_corrects.double() / len(train_dataset)
